@@ -53,7 +53,7 @@ int decryptBlock(const pair<int, int>& ciphertext, int a, int p) {
 int main() {
     srand(time(0));
 
-    int p = rand() % ((int)pow(2, 12) + 1) + (int)pow(2, 11);
+    int p = rand() % ((int)pow(2, 12) + 1) + (int)pow(2, 11); // provisionally
     int g = rand() % (p - 1) + 1;
 
     int a = rand() % (p - 1) + 1;

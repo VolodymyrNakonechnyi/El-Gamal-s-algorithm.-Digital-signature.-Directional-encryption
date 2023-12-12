@@ -5,4 +5,5 @@ El-Gamal's algorithm. Digital signature.
 
 Directional encryption:
 Decrypt:
-![image](https://github.com/VolodymyrNakonechnyi/El-Gamal-s-algorithm.-Digital-signature.-Directional-encryption/assets/146861887/7232c8fe-b618-49bd-8f47-0d79c63b1a2d)
+![image](https://github.com/VolodymyrNakonechnyi/El-Gamal-s-algorithm.-Digital-signature.-Directional-encryption/assets/146861887/99050e23-1468-4e5f-9790-357f958f6e99)
+

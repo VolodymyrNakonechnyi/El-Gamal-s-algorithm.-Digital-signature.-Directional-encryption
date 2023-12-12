@@ -67,7 +67,7 @@ vector<char> decrypt(const vector<int>& en_msg, int p, int key, int q) {
 }
 
 int main() {
-    srand(time(0)); // Seed for random number generation
+    srand(time(0)); 
 
     string msg = "encryption";
     cout << "Original Message : " << msg << endl;

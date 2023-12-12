@@ -1,88 +1,90 @@
 #include <iostream>
-#include <vector>
 #include <cmath>
+#include <vector>
 #include <cstdlib>
 #include <ctime>
 
 using namespace std;
 
-int modPow(int base, int exponent, int modulus) {
-    int result = 1;
-    base = base % modulus;
+int gcd(int a, int b) {
+    if (a < b) return gcd(b, a);
+    else if (a % b == 0) return b;
+    else return gcd(b, a % b);
+}
 
-    while (exponent > 0) {
-        if (exponent % 2 == 1)
-            result = (result * base) % modulus;
+int gen_key(int q) {
+    int key = rand() % (int)pow(10, 20);
+    while (gcd(q, key) != 1) {
+        key = rand() % (int)pow(10, 20);
+    }
+    return key;
+}
 
-        exponent = exponent >> 1;
-        base = (base * base) % modulus;
+int power(int a, int b, int c) {
+    int x = 1;
+    int y = a;
+
+    while (b > 0) {
+        if (b % 2 != 0) {
+            x = (x * y) % c;
+        }
+        y = (y * y) % c;
+        b = b / 2;
     }
 
-    return result;
+    return x % c;
 }
 
-vector<int> breakMessage(const string& msg) {
-    vector<int> blocks;
-    for (char ch : msg) {
-        blocks.push_back(static_cast<int>(ch));
+pair<vector<int>, int> encrypt(const string& msg, int q, int h, int g) {
+    vector<int> en_msg;
+    int k = gen_key(q);
+    int s = power(h, k, q);
+    int p = power(g, k, q);
+
+    for (char i : msg) {
+        en_msg.push_back(i);
     }
-    return blocks;
-}
 
-string joinBlocks(const vector<int>& blocks) {
-    string msg;
-    for (int block : blocks) {
-        msg.push_back(static_cast<char>(block));
+    cout << "g^k used : " << p << endl;
+    cout << "g^ak used : " << s << endl;
+
+    for (int i = 0; i < en_msg.size(); ++i) {
+        en_msg[i] = s * int(en_msg[i]);
     }
-    return msg;
+
+    return make_pair(en_msg, p);
 }
 
-pair<int, int> encryptBlock(int m, int k, int p, int g, int b) {
-    int x = modPow(g, k, p);
-    int y = (m * modPow(b, k, p)) % p;
-    return { x, y };
-}
+vector<char> decrypt(const vector<int>& en_msg, int p, int key, int q) {
+    vector<char> dr_msg;
+    int h = power(p, key, q);
 
-int decryptBlock(const pair<int, int>& ciphertext, int a, int p) {
-    int s = modPow(ciphertext.first, a, p);
-    int invS = modPow(s, p - 2, p);
-    int m = (ciphertext.second * invS) % p;
-    return m;
+    for (int i : en_msg) {
+        dr_msg.push_back(char(i / h));
+    }
+
+    return dr_msg;
 }
 
 int main() {
-    srand(time(0));
+    srand(time(0)); // Seed for random number generation
 
-    int p = rand() % ((int)pow(2, 12) + 1) + (int)pow(2, 11); // provisionally
-    int g = rand() % (p - 1) + 1;
+    string msg = "encryption";
+    cout << "Original Message : " << msg << endl;
 
-    int a = rand() % (p - 1) + 1;
-    int b = modPow(g, a, p);
+    int q = rand() % (int)pow(10, 50) + pow(10, 20);
+    int g = rand() % (q - 2) + 2;
 
-    string message = "Hello, ElGamal Encryption!";
+    int key = gen_key(q);
+    int h = power(g, key, q);
 
-    vector<int> messageBlocks = breakMessage(message);
+    cout << "g used : " << g << endl;
+    cout << "g^a used : " << h << endl;
 
-    vector<pair<int, int>> ciphertextBlocks;
-    for (int block : messageBlocks) {
-        int k = rand() % (p - 2) + 1;
-        ciphertextBlocks.push_back(encryptBlock(block, k, p, g, b));
-    }
+    auto encrypted_message = encrypt(msg, q, h, g);
+    auto decrypted_message = decrypt(encrypted_message.first, encrypted_message.second, key, q);
 
-    cout << "Encrypted Blocks: ";
-    for (const auto& block : ciphertextBlocks) {
-        cout << "(" << block.first << ", " << block.second << ") ";
-    }
-    cout << endl;
-
-    vector<int> decryptedBlocks;
-    for (const auto& block : ciphertextBlocks) {
-        decryptedBlocks.push_back(decryptBlock(block, a, p));
-    }
-
-    string decryptedMessage = joinBlocks(decryptedBlocks);
-
-    cout << "Decrypted Message: " << decryptedMessage << endl;
+    cout << "Decrypted Message : " << string(decrypted_message.begin(), decrypted_message.end()) << endl;
 
     return 0;
 }
